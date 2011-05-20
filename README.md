@@ -23,9 +23,14 @@ Values
 
     gorets:5|v
 
-This is a simple pass-thru value. It will send the latest value received during this interval as is to carbon. This means that if several values
-are received during the interval, only the last one is accumulated and forwarded to Graphite. The value is reset to 0 at the end of the interval.
-With this mode, StatsD effectively acts as a UDP-to-TCP bridge.
+This is a simple pass-thru value. By default, it forwards the *last* value submitted during the interval to carbon. It looks like a UDP-to-TCP bridge.
+This modifier accepts a number of additionnal (optionnal) flags:
+
+    last: the default, it means that only the last value submitted during the interval is submitted
+    first: sends the first value submitted during the interval (ignoring the others)
+    min: sends the min value submitted during the interval
+    max: sends the max value submitted during the interval
+    avg: sends the average of the values submitted during the interval 
 
 Counting
 --------
