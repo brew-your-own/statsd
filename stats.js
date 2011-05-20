@@ -5,6 +5,7 @@ var dgram  = require('dgram')
 
 var counters = {};
 var timers = {};
+var vals = {};
 var debugInt, flushInt, server;
 
 config.configFile(process.argv[2], function (config, oldConfig) {
@@ -16,7 +17,7 @@ config.configFile(process.argv[2], function (config, oldConfig) {
   if (config.debug) {
     if (debugInt !== undefined) { clearInterval(debugInt); }
     debugInt = setInterval(function () { 
-      sys.log("Counters:\n" + sys.inspect(counters) + "\nTimers:\n" + sys.inspect(timers));
+      sys.log("Counters:\n" + sys.inspect(counters) + "\nTimers:\n" + sys.inspect(timers) + "\nValues:\n" + sys.inspect(vals));
     }, config.debugInterval || 10000);
   }
 
@@ -45,6 +46,11 @@ config.configFile(process.argv[2], function (config, oldConfig) {
             timers[key] = [];
           }
           timers[key].push(Number(fields[0] || 0));
+        } else if(fields[1].trim() == "v") {
+            if( !vals[key]) {
+                vals[key] = 0;
+            }
+            vals[key] = Number(fields[0] || 0);
         } else {
           if (fields[2] && fields[2].match(/^@([\d\.]+)/)) {
             sampleRate = Number(fields[2].match(/^@([\d\.]+)/)[1]);
@@ -75,6 +81,15 @@ config.configFile(process.argv[2], function (config, oldConfig) {
         counters[key] = 0;
 
         numStats += 1;
+      }
+
+      for (key in vals) {
+          var value = vals[key];
+          var message = 'stats.' + key + ' ' + value + ' ' + ts + "\n";
+          statString += message;
+          vals[key] = 0;
+
+          numStats +=1;
       }
 
       for (key in timers) {
