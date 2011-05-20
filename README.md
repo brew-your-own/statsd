@@ -18,6 +18,15 @@ Concepts
 * *flush*
   After the flush interval timeout (default 10 seconds), stats are munged and sent over to Graphite.
 
+Values
+--------
+
+    gorets:5|v
+
+This is a simple pass-thru value. It will send the latest value received during this interval as is to carbon. This means that if several values
+are received during the interval, only the last one is accumulated and forwarded to Graphite. The value is reset to 0 at the end of the interval.
+
+
 Counting
 --------
 
