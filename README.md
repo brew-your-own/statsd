@@ -32,6 +32,10 @@ This modifier accepts a number of additionnal (optionnal) flags:
     max: sends the max value submitted during the interval
     avg: sends the average of the values submitted during the interval 
 
+Example:
+
+    pouf:5|v|avg
+
 Counting
 --------
 
