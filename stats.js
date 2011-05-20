@@ -19,7 +19,7 @@ config.configFile(process.argv[2], function (config, oldConfig) {
   if (config.debug) {
     if (debugInt !== undefined) { clearInterval(debugInt); }
     debugInt = setInterval(function () { 
-      sys.log("Counters:\n" + sys.inspect(counters) + "\nTimers:\n" + sys.inspect(timers) + "\nValues:\n" + sys.inspect(vals));
+      sys.log("Counters:\n" + sys.inspect(counters) + "\nTimers:\n" + sys.inspect(timers) + "\nValues:\n" + sys.inspect(vals) + "\nValue types:\n" + sys.inspect(valsType));
     }, config.debugInterval || 10000);
   }
 
@@ -120,7 +120,7 @@ config.configFile(process.argv[2], function (config, oldConfig) {
           var message = 'stats.' + key + ' ' + value + ' ' + ts + "\n";
           statString += message;
           vals[key] = [];
-          valsType[key] = [];
+          valsType[key] = 0;
           numStats +=1;
         }
       }
