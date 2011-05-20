@@ -7,7 +7,7 @@ var counters = {};
 var timers = {};
 var vals = {};
 var valsType = {};
-var vType = ["latest", "first", "min", "max", "avg"]
+var vType = ["last", "first", "min", "max", "avg"];
 var debugInt, flushInt, server;
 
 config.configFile(process.argv[2], function (config, oldConfig) {
