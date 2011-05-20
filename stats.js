@@ -6,6 +6,8 @@ var dgram  = require('dgram')
 var counters = {};
 var timers = {};
 var vals = {};
+var valsType = {};
+var vType = ["latest", "first", "min", "max", "avg"]
 var debugInt, flushInt, server;
 
 config.configFile(process.argv[2], function (config, oldConfig) {
@@ -48,9 +50,16 @@ config.configFile(process.argv[2], function (config, oldConfig) {
           timers[key].push(Number(fields[0] || 0));
         } else if(fields[1].trim() == "v") {
             if( !vals[key]) {
-                vals[key] = 0;
+                vals[key] = [];
+                valsType[key] = 0;
             }
-            vals[key] = Number(fields[0] || 0);
+            vals[key].push(Number(fields[0] || 0));
+            if(fields[2]){
+                var tmp = vType.indexOf(fields[2]);
+                if(tmp >=0) {
+                    valsType[key] = tmp;
+                }
+            }
         } else {
           if (fields[2] && fields[2].match(/^@([\d\.]+)/)) {
             sampleRate = Number(fields[2].match(/^@([\d\.]+)/)[1]);
@@ -84,14 +93,37 @@ config.configFile(process.argv[2], function (config, oldConfig) {
       }
 
       for (key in vals) {
-          var value = vals[key];
+     	if(vals[key].length > 0) {
+          var type = valsType[key];
+          var values = vals[key];
+          var count = values.length;
+          var value;
+          if(type == 0) {
+              value = values[0];
+          } else if(type == 1) {
+              value = values[count -1];
+          } else if(type == 4) {
+            var sum = 0;
+            for (var i = 0; i<count;i++) {
+              sum+=values[i];
+            }
+            value = sum/count;
+          }else {
+            var sortvalues = vals[key].sort(function (a,b) { return a-b });
+            if(type == 2) {
+              value = sortValues[0];
+            } else {
+              value = sortvalues[count -1];
+            }
+          }
+
           var message = 'stats.' + key + ' ' + value + ' ' + ts + "\n";
           statString += message;
-          vals[key] = 0;
-
+          vals[key] = [];
+          valsType[key] = [];
           numStats +=1;
+        }
       }
-
       for (key in timers) {
         if (timers[key].length > 0) {
           var pctThreshold = config.percentThreshold || 90;
